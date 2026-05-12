@@ -14,7 +14,7 @@
       <div class="badge">📚 Biblioteca TN2G</div>
       <h1>Aggiungi un libro</h1>
       <p>Registra un libro nella Biblioteca del Nettuno. Dopo l’invio comparirà nel catalogo e potrà essere richiesto in prestito dal sito.</p>
-      <div class="actions"><a class="btn btn-gold" href="index-v2.html">Torna alla biblioteca</a></div>
+      <div class="actions"><a class="btn btn-gold" href="biblioteca-v3.html">Torna alla biblioteca</a></div>
     </section>
 
     <section class="card">
@@ -33,7 +33,7 @@
         </div>
         <div class="field"><label for="note">Note</label><textarea id="note" placeholder="Condizioni del libro, vibes, avvertenze, ecc."></textarea></div>
         <div class="field"><label for="copertina">Copertina URL opzionale</label><input id="copertina" placeholder="https://..." /><p class="hint">Campo opzionale. Per ora il sito usa soprattutto lo scaffale virtuale, ma ci lasciamo pronta la copertina.</p></div>
-        <div class="actions"><button id="submitBtn" class="btn btn-blue" type="submit">Registra libro</button><a class="btn btn-gold" href="index-v2.html#catalogo">Vai al catalogo</a></div>
+        <div class="actions"><button id="submitBtn" class="btn btn-blue" type="submit">Registra libro</button><a class="btn btn-gold" href="biblioteca-v3.html#catalogo">Vai al catalogo</a></div>
         <div id="feedback" class="feedback"></div>
       </form>
     </section>
@@ -44,40 +44,15 @@
     const form = document.getElementById("bookForm");
     const feedback = document.getElementById("feedback");
     const submitBtn = document.getElementById("submitBtn");
-
-    function setFeedback(text, isError = false) {
-      feedback.textContent = text;
-      feedback.className = "feedback " + (isError ? "error" : "ok");
-    }
-
+    function setFeedback(text, isError = false) { feedback.textContent = text; feedback.className = "feedback " + (isError ? "error" : "ok"); }
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
-      const payload = {
-        action: "add_book",
-        titolo: document.getElementById("titolo").value.trim(),
-        autore: document.getElementById("autore").value.trim(),
-        categoria: document.getElementById("categoria").value.trim(),
-        proprietario: document.getElementById("proprietario").value.trim(),
-        contatto: document.getElementById("contatto").value.trim(),
-        stato: document.getElementById("stato").value.trim(),
-        note: document.getElementById("note").value.trim(),
-        copertina_url: document.getElementById("copertina").value.trim()
-      };
-      if (!payload.titolo || !payload.autore || !payload.proprietario) {
-        setFeedback("Compila almeno titolo, autore e proprietario.", true);
-        return;
-      }
-      submitBtn.disabled = true;
-      setFeedback("Invio il libro al Nettuno...");
-      try {
-        await fetch(BACKEND_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
-        setFeedback("Libro inviato. Se il backend è aggiornato, comparirà nel catalogo entro pochi secondi.");
-        form.reset();
-      } catch (error) {
-        setFeedback("Errore durante l’invio. Controlla il backend Apps Script.", true);
-      } finally {
-        submitBtn.disabled = false;
-      }
+      const payload = { action: "add_book", titolo: document.getElementById("titolo").value.trim(), autore: document.getElementById("autore").value.trim(), categoria: document.getElementById("categoria").value.trim(), proprietario: document.getElementById("proprietario").value.trim(), contatto: document.getElementById("contatto").value.trim(), stato: document.getElementById("stato").value.trim(), note: document.getElementById("note").value.trim(), copertina_url: document.getElementById("copertina").value.trim() };
+      if (!payload.titolo || !payload.autore || !payload.proprietario) { setFeedback("Compila almeno titolo, autore e proprietario.", true); return; }
+      submitBtn.disabled = true; setFeedback("Invio il libro al Nettuno...");
+      try { await fetch(BACKEND_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) }); setFeedback("Libro inviato. Comparirà nel catalogo entro pochi secondi."); form.reset(); }
+      catch (error) { setFeedback("Errore durante l’invio. Controlla il backend Apps Script.", true); }
+      finally { submitBtn.disabled = false; }
     });
   </script>
 </body>
