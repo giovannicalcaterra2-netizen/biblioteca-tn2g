@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aggiungi libro | Biblioteca TN2G</title>
+  <style>
+    :root{--blue:#12355B;--dark:#071726;--gold:#F4D35E;--gold2:#C9A83F;--paper:#fff8ea;--ink:#1d2530;--muted:#667085;--green:#25D366;--red:#B42318}*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:radial-gradient(circle at 15% 10%,rgba(244,211,94,.22),transparent 32%),linear-gradient(135deg,#eef3f8,#fff8ea)}main{width:min(900px,calc(100% - 28px));margin:0 auto;padding:28px 0 70px}.hero{border-radius:34px;padding:clamp(30px,6vw,60px);color:white;background:radial-gradient(circle at top right,rgba(244,211,94,.24),transparent 31%),linear-gradient(135deg,var(--blue),var(--dark));box-shadow:0 24px 70px rgba(7,23,38,.2)}.badge{display:inline-flex;background:var(--gold);color:var(--blue);font-weight:950;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;padding:9px 15px;border-radius:999px;margin-bottom:18px}h1{font-size:clamp(2.2rem,7vw,4.4rem);line-height:.98;margin:0 0 18px;letter-spacing:-.05em}.hero p{font-size:1.1rem;line-height:1.6;opacity:.94;max-width:680px}.card{margin-top:24px;border-radius:28px;background:rgba(255,255,255,.94);box-shadow:0 16px 50px rgba(7,23,38,.11);border:1px solid rgba(18,53,91,.08);padding:clamp(22px,4vw,34px)}label{display:block;color:var(--blue);font-weight:900;margin:0 0 8px}input,select,textarea{width:100%;border:1px solid rgba(18,53,91,.16);background:white;border-radius:16px;padding:14px;min-height:48px;font:inherit;color:var(--ink);outline:none}textarea{min-height:100px;resize:vertical}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field{margin-bottom:16px}.btn{border:0;cursor:pointer;border-radius:999px;padding:14px 22px;min-height:50px;display:inline-flex;align-items:center;justify-content:center;gap:9px;font:inherit;font-size:.98rem;font-weight:900;text-decoration:none;transition:transform .12s ease,opacity .2s ease;white-space:nowrap}.btn:hover{transform:translateY(-2px)}.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}.btn-gold{background:var(--gold);color:var(--blue);box-shadow:0 8px 0 var(--gold2)}.btn-blue{background:var(--blue);color:white;box-shadow:0 8px 0 #08233d}.actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}.feedback{margin-top:16px;min-height:24px;font-weight:900;color:var(--blue)}.feedback.ok{color:#137a3d}.feedback.error{color:var(--red)}.hint{color:var(--muted);line-height:1.5;font-size:.95rem}@media(max-width:700px){.grid{grid-template-columns:1fr}.actions{flex-direction:column;align-items:stretch}.btn{width:100%}.hero,.card{border-radius:22px}}
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <div class="badge">📚 Biblioteca TN2G</div>
+      <h1>Aggiungi un libro</h1>
+      <p>Registra un libro nella Biblioteca del Nettuno. Dopo l’invio comparirà nel catalogo e potrà essere richiesto in prestito dal sito.</p>
+      <div class="actions"><a class="btn btn-gold" href="index-v2.html">Torna alla biblioteca</a></div>
+    </section>
+
+    <section class="card">
+      <form id="bookForm">
+        <div class="grid">
+          <div class="field"><label for="titolo">Titolo *</label><input id="titolo" required placeholder="es. Il nome della rosa" /></div>
+          <div class="field"><label for="autore">Autore *</label><input id="autore" required placeholder="es. Umberto Eco" /></div>
+        </div>
+        <div class="grid">
+          <div class="field"><label for="categoria">Categoria</label><select id="categoria"><option>Romanzo</option><option>Classici</option><option>Fantasy</option><option>Sci-fi</option><option>Saggio</option><option>Poesia</option><option>Manga</option><option>Fumetto</option><option>Giallo / Thriller</option><option>Distopia</option><option>Filosofia</option><option>Storia</option><option>Ambiente / Natura</option><option>Manuale / Tecnico</option><option>Altro caos</option></select></div>
+          <div class="field"><label for="stato">Stato iniziale</label><select id="stato"><option>Disponibile</option><option>Non disponibile</option></select></div>
+        </div>
+        <div class="grid">
+          <div class="field"><label for="proprietario">Proprietario *</label><input id="proprietario" required placeholder="es. Giovanni" /></div>
+          <div class="field"><label for="contatto">Contatto</label><input id="contatto" placeholder="telefono, nickname, IG..." /></div>
+        </div>
+        <div class="field"><label for="note">Note</label><textarea id="note" placeholder="Condizioni del libro, vibes, avvertenze, ecc."></textarea></div>
+        <div class="field"><label for="copertina">Copertina URL opzionale</label><input id="copertina" placeholder="https://..." /><p class="hint">Campo opzionale. Per ora il sito usa soprattutto lo scaffale virtuale, ma ci lasciamo pronta la copertina.</p></div>
+        <div class="actions"><button id="submitBtn" class="btn btn-blue" type="submit">Registra libro</button><a class="btn btn-gold" href="index-v2.html#catalogo">Vai al catalogo</a></div>
+        <div id="feedback" class="feedback"></div>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzBJCzDZnuOmSdtPXPN3s5whAP6bSXa59t89NxSltLrIhkTfh3Gig4cj7HYb5aG1A9Vbw/exec";
+    const form = document.getElementById("bookForm");
+    const feedback = document.getElementById("feedback");
+    const submitBtn = document.getElementById("submitBtn");
+
+    function setFeedback(text, isError = false) {
+      feedback.textContent = text;
+      feedback.className = "feedback " + (isError ? "error" : "ok");
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const payload = {
+        action: "add_book",
+        titolo: document.getElementById("titolo").value.trim(),
+        autore: document.getElementById("autore").value.trim(),
+        categoria: document.getElementById("categoria").value.trim(),
+        proprietario: document.getElementById("proprietario").value.trim(),
+        contatto: document.getElementById("contatto").value.trim(),
+        stato: document.getElementById("stato").value.trim(),
+        note: document.getElementById("note").value.trim(),
+        copertina_url: document.getElementById("copertina").value.trim()
+      };
+      if (!payload.titolo || !payload.autore || !payload.proprietario) {
+        setFeedback("Compila almeno titolo, autore e proprietario.", true);
+        return;
+      }
+      submitBtn.disabled = true;
+      setFeedback("Invio il libro al Nettuno...");
+      try {
+        await fetch(BACKEND_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
+        setFeedback("Libro inviato. Se il backend è aggiornato, comparirà nel catalogo entro pochi secondi.");
+        form.reset();
+      } catch (error) {
+        setFeedback("Errore durante l’invio. Controlla il backend Apps Script.", true);
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
