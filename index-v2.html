@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Biblioteca del Nettuno | TN2G</title>
+  <style>
+    :root {
+      --tn2g-blue: #12355B;
+      --tn2g-dark: #071726;
+      --tn2g-gold: #F4D35E;
+      --tn2g-gold-dark: #C9A83F;
+      --paper: #fff8ea;
+      --ink: #1d2530;
+      --muted: #667085;
+      --card: rgba(255,255,255,0.94);
+      --shadow: 0 24px 70px rgba(7,23,38,0.20);
+      --green: #25D366;
+      --red: #B42318;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(244,211,94,0.22), transparent 32%),
+        radial-gradient(circle at 88% 18%, rgba(18,53,91,0.18), transparent 28%),
+        linear-gradient(135deg, #eef3f8 0%, #fff8ea 100%);
+    }
+
+    .page-shell { width: min(1180px, calc(100% - 28px)); margin: 0 auto; padding: 28px 0 70px; }
+    .hero {
+      position: relative; overflow: hidden; border-radius: 34px; padding: clamp(34px, 6vw, 70px);
+      color: white;
+      background: radial-gradient(circle at top right, rgba(244,211,94,0.24), transparent 31%), linear-gradient(135deg, var(--tn2g-blue), var(--tn2g-dark));
+      box-shadow: var(--shadow);
+    }
+    .hero::before, .hero::after { content: ""; position: absolute; border-radius: 999px; background: rgba(255,255,255,0.07); pointer-events:none; }
+    .hero::before { width:260px; height:260px; top:-110px; right:-70px; }
+    .hero::after { width:180px; height:180px; bottom:-80px; left:-55px; }
+    .hero-content { position:relative; z-index:2; max-width: 880px; }
+    .badge { display:inline-flex; align-items:center; gap:8px; background:var(--tn2g-gold); color:var(--tn2g-blue); font-weight:950; font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; padding:9px 15px; border-radius:999px; margin-bottom:18px; }
+    h1 { font-size: clamp(2.35rem, 7vw, 5rem); line-height:.97; margin:0 0 18px; letter-spacing:-.05em; }
+    .hero p { max-width:760px; font-size: clamp(1.05rem, 2.2vw, 1.25rem); line-height:1.6; margin:0 0 28px; opacity:.94; }
+
+    .btn { border:0; cursor:pointer; border-radius:999px; padding:14px 22px; min-height:50px; display:inline-flex; align-items:center; justify-content:center; gap:9px; font:inherit; font-size:.98rem; font-weight:900; text-decoration:none; transition: transform .12s ease, box-shadow .12s ease, opacity .2s ease; white-space:nowrap; }
+    .btn:hover { transform: translateY(-2px); text-decoration:none; }
+    .btn:active { transform: translateY(3px); }
+    .btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+    .btn-gold { background:var(--tn2g-gold); color:var(--tn2g-blue); box-shadow:0 8px 0 var(--tn2g-gold-dark); }
+    .btn-light { background:white; color:var(--tn2g-blue); box-shadow:0 8px 0 rgba(255,255,255,.45); }
+    .btn-blue { background:var(--tn2g-blue); color:white; box-shadow:0 8px 0 #08233d; }
+    .btn-green { background:var(--green); color:white; box-shadow:0 8px 0 #128C47; }
+    .btn-red { background:var(--red); color:white; box-shadow:0 8px 0 #7A271A; }
+    .btn-ghost { background:rgba(255,255,255,.12); color:white; border:1px solid rgba(255,255,255,.22); }
+    .hero-actions, .section-actions { display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
+
+    .stats-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin:22px 0 0; }
+    .stat-card { position:relative; z-index:2; border-radius:22px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.17); padding:18px; color:white; }
+    .stat-number { display:block; font-size:2rem; font-weight:950; line-height:1; color:var(--tn2g-gold); }
+    .stat-label { display:block; margin-top:6px; font-size:.9rem; opacity:.9; }
+
+    .nav-pills { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin:22px 0; position:sticky; top:10px; z-index:20; }
+    .nav-pills a { border-radius:999px; padding:10px 14px; background:rgba(255,255,255,.80); backdrop-filter:blur(12px); border:1px solid rgba(18,53,91,.10); text-decoration:none; color:var(--tn2g-blue); font-weight:850; box-shadow:0 10px 30px rgba(18,53,91,.08); }
+
+    .section { margin-top:28px; border-radius:28px; background:var(--card); box-shadow:0 16px 50px rgba(7,23,38,.11); border:1px solid rgba(18,53,91,.08); padding:clamp(22px, 4vw, 34px); }
+    .section-header { display:flex; align-items:end; justify-content:space-between; gap:18px; margin-bottom:22px; }
+    .section h2 { margin:0; color:var(--tn2g-blue); letter-spacing:-.03em; font-size:clamp(1.8rem, 4vw, 2.75rem); line-height:1; }
+    .section-intro { margin:10px 0 0; color:var(--muted); line-height:1.55; max-width:720px; }
+
+    .shelf-wrap { background:linear-gradient(180deg, rgba(255,255,255,.25), rgba(255,255,255,0)), linear-gradient(135deg,#6d3f1d,#3c220f); border-radius:28px; padding:24px 18px 30px; box-shadow:inset 0 0 0 1px rgba(255,255,255,.15),0 20px 45px rgba(60,34,15,.20); overflow-x:auto; }
+    .shelf { display:flex; align-items:end; gap:8px; min-height:250px; padding:10px 8px 22px; border-bottom:18px solid #2b1709; box-shadow:0 16px 0 #5a3217; }
+    .book-spine { --book-h:170px; width:44px; height:var(--book-h); flex:0 0 44px; border:0; cursor:pointer; color:white; border-radius:8px 8px 4px 4px; padding:10px 5px; display:flex; align-items:center; justify-content:center; writing-mode:vertical-rl; text-orientation:mixed; font:inherit; font-size:.76rem; font-weight:900; overflow:hidden; box-shadow:inset 8px 0 0 rgba(255,255,255,.12), inset -5px 0 0 rgba(0,0,0,.11),0 7px 0 rgba(0,0,0,.18); transition:transform .16s ease, filter .16s ease; }
+    .book-spine:hover { transform:translateY(-8px) rotate(-1deg); filter:brightness(1.07); }
+    .book-spine.is-loaned { opacity:.62; filter:grayscale(.35); }
+    .book-spine small { opacity:.85; font-weight:700; margin-top:8px; }
+
+    .tools, .loan-panels { display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:12px; margin-bottom:18px; }
+    .loan-panels { grid-template-columns:1fr 1fr; align-items:start; }
+    input, select, textarea { width:100%; border:1px solid rgba(18,53,91,.16); background:white; border-radius:16px; padding:14px; min-height:48px; font:inherit; color:var(--ink); outline:none; }
+    textarea { min-height:86px; resize:vertical; }
+    input:focus, select:focus, textarea:focus { border-color:var(--tn2g-blue); box-shadow:0 0 0 4px rgba(18,53,91,.10); }
+    label { display:block; color:var(--tn2g-blue); font-weight:900; margin:0 0 8px; }
+
+    .catalog-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+    .book-card, .reader-card, .activity-card, .loan-panel { border-radius:22px; background:white; border:1px solid rgba(18,53,91,.08); padding:18px; box-shadow:0 12px 30px rgba(18,53,91,.07); }
+    .book-card { cursor:pointer; transition:transform .12s ease, box-shadow .12s ease; }
+    .book-card:hover { transform:translateY(-3px); box-shadow:0 16px 34px rgba(18,53,91,.12); }
+    .book-topline { display:flex; gap:10px; align-items:start; justify-content:space-between; }
+    .book-title { margin:0 0 6px; color:var(--tn2g-blue); font-size:1.08rem; line-height:1.2; font-weight:950; }
+    .book-meta { margin:0; color:var(--muted); font-size:.92rem; line-height:1.45; }
+    .chip { border-radius:999px; padding:6px 10px; font-size:.78rem; font-weight:900; white-space:nowrap; background:rgba(18,53,91,.08); color:var(--tn2g-blue); }
+    .chip.available { background:rgba(37,211,102,.14); color:#137a3d; }
+    .chip.loaned { background:rgba(244,211,94,.24); color:#765f05; }
+
+    .readers-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; }
+    .reader-card { text-align:center; }
+    .avatar { width:82px; height:82px; margin:0 auto 12px; border-radius:28px; display:flex; align-items:center; justify-content:center; background:radial-gradient(circle at top right, rgba(244,211,94,.55), transparent 35%), linear-gradient(135deg, rgba(18,53,91,.12), rgba(18,53,91,.04)); font-size:2.7rem; box-shadow:inset 0 0 0 1px rgba(18,53,91,.10); }
+    .reader-card h3 { margin:0 0 4px; color:var(--tn2g-blue); font-size:1.05rem; }
+    .reader-card p { margin:0; color:var(--muted); font-size:.9rem; line-height:1.35; }
+
+    .activity-list { display:grid; gap:12px; }
+    .activity-card { display:grid; grid-template-columns:auto 1fr auto; gap:14px; align-items:center; }
+    .activity-icon { width:48px; height:48px; border-radius:18px; display:flex; align-items:center; justify-content:center; background:rgba(18,53,91,.08); font-size:1.5rem; }
+    .activity-card h3 { margin:0 0 4px; color:var(--tn2g-blue); font-size:1rem; }
+    .activity-card p { margin:0; color:var(--muted); font-size:.92rem; line-height:1.4; }
+
+    .empty-state { border-radius:22px; padding:26px; background:rgba(18,53,91,.07); color:var(--tn2g-blue); font-weight:800; text-align:center; line-height:1.5; }
+    .feedback { margin-top:12px; min-height:24px; color:var(--tn2g-blue); font-weight:900; }
+    .feedback.error { color:var(--red); }
+    .feedback.ok { color:#137a3d; }
+
+    .modal-backdrop { position:fixed; inset:0; display:none; align-items:center; justify-content:center; padding:18px; background:rgba(7,23,38,.62); z-index:100; }
+    .modal-backdrop.is-open { display:flex; }
+    .modal { width:min(760px,100%); max-height:90vh; overflow:auto; background:var(--paper); color:var(--ink); border-radius:28px; padding:24px; box-shadow:0 30px 90px rgba(0,0,0,.35); position:relative; }
+    .modal h2 { margin:0 44px 8px 0; color:var(--tn2g-blue); font-size:clamp(1.7rem,4vw,2.8rem); line-height:1; letter-spacing:-.04em; }
+    .modal p { color:var(--muted); line-height:1.55; }
+    .modal-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:18px 0; }
+    .detail { border-radius:18px; background:white; border:1px solid rgba(18,53,91,.08); padding:14px; }
+    .detail strong { display:block; color:var(--tn2g-blue); font-size:.82rem; text-transform:uppercase; letter-spacing:.06em; margin-bottom:5px; }
+    .close-modal { position:absolute; top:18px; right:18px; width:42px; height:42px; border:0; border-radius:999px; background:white; color:var(--tn2g-blue); font-size:1.4rem; cursor:pointer; font-weight:900; }
+    footer { text-align:center; margin-top:34px; color:var(--muted); font-size:.92rem; }
+
+    @media (max-width:920px){ .stats-grid,.catalog-grid,.readers-grid,.loan-panels{grid-template-columns:repeat(2,minmax(0,1fr));} .tools{grid-template-columns:1fr;} .section-header{display:block;} .section-actions{margin-top:14px;} }
+    @media (max-width:620px){ .page-shell{width:min(100% - 18px,1180px); padding-top:12px;} .hero,.section{border-radius:22px; padding:24px 18px;} .stats-grid,.catalog-grid,.readers-grid,.modal-grid,.loan-panels{grid-template-columns:1fr;} .hero-actions,.section-actions{flex-direction:column; align-items:stretch;} .btn{width:100%;} .nav-pills{position:static;} .activity-card{grid-template-columns:1fr; text-align:center;} .activity-icon{margin:0 auto;} }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero">
+      <div class="hero-content">
+        <div class="badge">📚 Biblioteca TN2G</div>
+        <h1>Biblioteca del Nettuno</h1>
+        <p>Il registro semi-ufficiale dei libri che circolano in TN2G: prestiti dal sito, restituzioni con un click, avatar sospetti e cultura che prova a tornare indietro.</p>
+        <div class="hero-actions">
+          <a class="btn btn-gold" href="#catalogo">Sfoglia il catalogo</a>
+          <a class="btn btn-light" href="#prestiti">Gestisci prestiti</a>
+          <a id="registerLinkTop" class="btn btn-ghost" href="#" target="_blank" rel="noopener noreferrer">Registrati</a>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card"><span id="statBooks" class="stat-number">0</span><span class="stat-label">libri registrati</span></div>
+          <div class="stat-card"><span id="statAvailable" class="stat-number">0</span><span class="stat-label">disponibili</span></div>
+          <div class="stat-card"><span id="statReaders" class="stat-number">0</span><span class="stat-label">lettori</span></div>
+          <div class="stat-card"><span id="statReadings" class="stat-number">0</span><span class="stat-label">letture registrate</span></div>
+        </div>
+      </div>
+    </section>
+
+    <nav class="nav-pills" aria-label="Navigazione Biblioteca">
+      <a href="#scaffale">Scaffale</a>
+      <a href="#catalogo">Catalogo</a>
+      <a href="#prestiti">Prestiti</a>
+      <a href="#lettori">Lettori</a>
+      <a href="#letture">Letture</a>
+    </nav>
+
+    <section id="scaffale" class="section">
+      <div class="section-header"><div><h2>Scaffale virtuale</h2><p class="section-intro">Clicca su una costina per aprire la scheda del libro. I volumi opachi sono in prestito.</p></div></div>
+      <div class="shelf-wrap"><div id="shelf" class="shelf"></div></div>
+    </section>
+
+    <section id="catalogo" class="section">
+      <div class="section-header"><div><h2>Catalogo alfabetico</h2><p class="section-intro">Cerca per titolo, autore, proprietario o categoria. Finalmente un caos consultabile.</p></div></div>
+      <div class="tools">
+        <input id="searchInput" type="search" placeholder="Cerca libro, autore, proprietario..." />
+        <select id="statusFilter"><option value="all">Tutti gli stati</option><option value="disponibile">Disponibili</option><option value="in prestito">In prestito</option><option value="non disponibile">Non disponibili</option></select>
+        <select id="categoryFilter"><option value="all">Tutte le categorie</option></select>
+      </div>
+      <div id="catalogGrid" class="catalog-grid"></div>
+    </section>
+
+    <section id="prestiti" class="section">
+      <div class="section-header"><div><h2>Prestiti & restituzioni</h2><p class="section-intro">Niente più titoli scritti a mano: il sito usa l’ID del libro. Selezioni dal menu, clicchi, il foglio si aggiorna.</p></div></div>
+      <div class="loan-panels">
+        <div class="loan-panel">
+          <h3 class="book-title">🤝 Richiedi un prestito</h3>
+          <label for="loanBookSelect">Libro disponibile</label>
+          <select id="loanBookSelect"></select>
+          <label for="loanNickname" style="margin-top:12px;">Il tuo nickname</label>
+          <input id="loanNickname" type="text" placeholder="es. Arancino_coi_piedi" autocomplete="nickname" />
+          <label for="loanNote" style="margin-top:12px;">Nota opzionale</label>
+          <textarea id="loanNote" placeholder="Tipo: lo custodirò come un tomo sacro"></textarea>
+          <button id="loanSubmitBtn" class="btn btn-green" style="margin-top:12px;">Richiedi prestito</button>
+          <div id="loanFeedback" class="feedback"></div>
+        </div>
+        <div class="loan-panel">
+          <h3 class="book-title">↩️ Segnala restituzione</h3>
+          <label for="returnBookSelect">Libro attualmente in prestito</label>
+          <select id="returnBookSelect"></select>
+          <button id="returnSubmitBtn" class="btn btn-red" style="margin-top:12px;">Segnala restituzione</button>
+          <div id="returnFeedback" class="feedback"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="lettori" class="section">
+      <div class="section-header"><div><h2>Lettori della biblioteca</h2><p class="section-intro">Avatar casuali, titoli discutibili e persone che forse restituiranno i libri.</p></div><div class="section-actions"><a id="registerLinkSection" class="btn btn-blue" href="#" target="_blank" rel="noopener noreferrer">Registrati alla Biblioteca</a></div></div>
+      <div id="readersGrid" class="readers-grid"></div>
+    </section>
+
+    <section id="letture" class="section">
+      <div class="section-header"><div><h2>Registro letture</h2><p class="section-intro">Chi sta leggendo cosa, chi ha finito, chi ha mollato e chi ha lasciato una mini-recensione.</p></div><div class="section-actions"><a id="readingLinkSection" class="btn btn-blue" href="#" target="_blank" rel="noopener noreferrer">Registra lettura</a></div></div>
+      <div id="activityList" class="activity-list"></div>
+    </section>
+
+    <footer>Biblioteca del Nettuno — dove i libri entrano disponibili, escono in prestito e a volte tornano.</footer>
+  </main>
+
+  <div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true"><div class="modal"><button id="closeModal" class="close-modal" aria-label="Chiudi">×</button><div id="modalContent"></div></div></div>
+
+  <script>
+    const CONFIG = {
+      backendUrl: "https://script.google.com/macros/s/AKfycbzBJCzDZnuOmSdtPXPN3s5whAP6bSXa59t89NxSltLrIhkTfh3Gig4cj7HYb5aG1A9Vbw/exec",
+      csv: {
+        libri: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQGqn7EPMUccJZbWKOY00b0YMMwjDr_MELJWYXiddsTbO3HGsZmP5l9yK264Cafo9RqoHTAYQkIjh0b/pub?gid=1961108971&single=true&output=csv",
+        lettori: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQGqn7EPMUccJZbWKOY00b0YMMwjDr_MELJWYXiddsTbO3HGsZmP5l9yK264Cafo9RqoHTAYQkIjh0b/pub?gid=1189039051&single=true&output=csv",
+        letture: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQGqn7EPMUccJZbWKOY00b0YMMwjDr_MELJWYXiddsTbO3HGsZmP5l9yK264Cafo9RqoHTAYQkIjh0b/pub?gid=239994532&single=true&output=csv",
+        prestiti: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQGqn7EPMUccJZbWKOY00b0YMMwjDr_MELJWYXiddsTbO3HGsZmP5l9yK264Cafo9RqoHTAYQkIjh0b/pub?gid=0&single=true&output=csv"
+      },
+      forms: {
+        registrazione: "https://docs.google.com/forms/d/e/1FAIpQLSc7OI1dTR2IeYV6tW__4hVL_6G2YsBRGrUfW45CqGYjTRMbtw/viewform?usp=publish-editor",
+        registraLettura: "https://docs.google.com/forms/d/e/1FAIpQLScvBz_m8vcXFOiQzKUCSjS53qepKFTsBisbJ5nynrAkhO4qaQ/viewform?usp=publish-editor"
+      },
+      colors: ["#12355B", "#8A1538", "#2F855A", "#B7791F", "#6B46C1", "#C05621", "#2B6CB0", "#718096", "#0F766E", "#9F1239"]
+    };
+
+    let state = { books: [], readers: [], readings: [], loans: [], filteredBooks: [] };
+
+    function normalizeKey(key) { return String(key || "").trim(); }
+    function value(row, key, fallback = "") { return row && row[key] !== undefined && row[key] !== null ? String(row[key]).trim() : fallback; }
+    function escapeHTML(str) { return String(str || "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
+
+    function parseCSV(text) {
+      const rows = []; let row = []; let current = ""; let inQuotes = false;
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i], next = text[i + 1];
+        if (char === '"' && inQuotes && next === '"') { current += '"'; i++; }
+        else if (char === '"') inQuotes = !inQuotes;
+        else if (char === "," && !inQuotes) { row.push(current); current = ""; }
+        else if ((char === "\n" || char === "\r") && !inQuotes) { if (char === "\r" && next === "\n") i++; row.push(current); if (row.some(c => String(c).trim() !== "")) rows.push(row); row = []; current = ""; }
+        else current += char;
+      }
+      row.push(current); if (row.some(c => String(c).trim() !== "")) rows.push(row);
+      if (!rows.length) return [];
+      const headers = rows[0].map(normalizeKey);
+      return rows.slice(1).map(cells => { const obj = {}; headers.forEach((h, i) => obj[h] = cells[i] !== undefined ? cells[i].trim() : ""); return obj; });
+    }
+
+    async function fetchCSV(url) {
+      const sep = url.includes("?") ? "&" : "?";
+      const response = await fetch(url + sep + "cache=" + Date.now(), { cache: "no-store" });
+      if (!response.ok) throw new Error("Errore CSV");
+      return parseCSV(await response.text());
+    }
+
+    function loanBookId(loan) { return value(loan, "book_id") || value(loan, "Book ID") || value(loan, "ID libro"); }
+    function loanStatus(loan) { return (value(loan, "stato_prestito") || value(loan, "Stato prestito") || value(loan, "Stato")).toLowerCase(); }
+    function activeLoanFor(book) { return state.loans.find(l => loanBookId(l) === value(book, "ID") && loanStatus(l) === "attivo"); }
+    function isLoaned(book) { return !!activeLoanFor(book) || value(book, "Stato").toLowerCase() === "in prestito"; }
+    function isAvailable(book) { return value(book, "Stato").toLowerCase() === "disponibile" && !activeLoanFor(book); }
+    function compareBooks(a, b) { return value(a, "Titolo").localeCompare(value(b, "Titolo"), "it", { sensitivity: "base" }); }
+    function bookColor(index) { return CONFIG.colors[index % CONFIG.colors.length]; }
+    function dateFromLoan(loan, keys) { for (const k of keys) { const v = value(loan, k); if (v) return v; } return ""; }
+
+    async function loadData() {
+      try {
+        const [books, readers, readings, loans] = await Promise.all([fetchCSV(CONFIG.csv.libri), fetchCSV(CONFIG.csv.lettori), fetchCSV(CONFIG.csv.letture), fetchCSV(CONFIG.csv.prestiti)]);
+        state.books = books || []; state.readers = readers || []; state.readings = readings || []; state.loans = loans || [];
+      } catch (err) {
+        console.error(err);
+        state.books = []; state.readers = []; state.readings = []; state.loans = [];
+      }
+      state.filteredBooks = [...state.books].sort(compareBooks);
+      setupLinks(); populateCategoryFilter(); renderAll();
+    }
+
+    function setupLinks() {
+      ["registerLinkTop", "registerLinkSection"].forEach(id => document.getElementById(id).href = CONFIG.forms.registrazione);
+      document.getElementById("readingLinkSection").href = CONFIG.forms.registraLettura;
+    }
+
+    function populateCategoryFilter() {
+      const select = document.getElementById("categoryFilter");
+      const current = select.value;
+      select.innerHTML = '<option value="all">Tutte le categorie</option>';
+      [...new Set(state.books.map(b => value(b, "Categoria")).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"it",{sensitivity:"base"})).forEach(category => {
+        const option = document.createElement("option"); option.value = category.toLowerCase(); option.textContent = category; select.appendChild(option);
+      });
+      select.value = current || "all";
+    }
+
+    function renderAll() { renderStats(); renderShelf(); renderCatalog(); renderLoanControls(); renderReaders(); renderReadings(); }
+    function renderStats() { document.getElementById("statBooks").textContent = state.books.length; document.getElementById("statAvailable").textContent = state.books.filter(isAvailable).length; document.getElementById("statReaders").textContent = state.readers.length; document.getElementById("statReadings").textContent = state.readings.length; }
+
+    function renderShelf() {
+      const shelf = document.getElementById("shelf"); shelf.innerHTML = "";
+      const books = [...state.books].sort(compareBooks);
+      if (!books.length) { shelf.innerHTML = '<div class="empty-state">Nessun libro ancora registrato. Il Nettuno attende il primo tomo.</div>'; return; }
+      books.forEach((book, index) => { const btn = document.createElement("button"); btn.className = "book-spine" + (isLoaned(book) ? " is-loaned" : ""); btn.style.background = bookColor(index); btn.style.setProperty("--book-h", (145 + (index % 5) * 18) + "px"); btn.title = `${value(book,"Titolo")} — ${value(book,"Autore")}`; btn.innerHTML = `${escapeHTML(value(book,"Titolo"))}<small>${escapeHTML(value(book,"Autore"))}</small>`; btn.addEventListener("click", () => openBookModal(book)); shelf.appendChild(btn); });
+    }
+
+    function renderCatalog() {
+      const grid = document.getElementById("catalogGrid"); grid.innerHTML = "";
+      if (!state.filteredBooks.length) { grid.innerHTML = '<div class="empty-state">Nessun libro trovato. Prova a cambiare filtro.</div>'; return; }
+      state.filteredBooks.forEach(book => {
+        const loan = activeLoanFor(book);
+        const status = isLoaned(book) ? "In prestito" : (value(book, "Stato") || "Non indicato");
+        const card = document.createElement("article"); card.className = "book-card"; card.addEventListener("click", () => openBookModal(book));
+        card.innerHTML = `<div class="book-topline"><div><h3 class="book-title">${escapeHTML(value(book,"Titolo"))}</h3><p class="book-meta">${escapeHTML(value(book,"Autore"))}</p></div><span class="chip ${isAvailable(book) ? "available" : isLoaned(book) ? "loaned" : ""}">${escapeHTML(status)}</span></div><p class="book-meta" style="margin-top:12px;">ID: <strong>${escapeHTML(value(book,"ID"))}</strong><br>Proprietario: <strong>${escapeHTML(value(book,"Proprietario","Non indicato"))}</strong><br>Categoria: ${escapeHTML(value(book,"Categoria","Senza categoria"))}${loan ? `<br>Prestato a: <strong>${escapeHTML(value(loan,"richiedente") || value(book,"Prestato a"))}</strong>` : ""}</p>`;
+        grid.appendChild(card);
+      });
+    }
+
+    function renderLoanControls() {
+      const available = state.books.filter(isAvailable).sort(compareBooks);
+      const loaned = state.books.filter(isLoaned).sort(compareBooks);
+      const loanSelect = document.getElementById("loanBookSelect");
+      const returnSelect = document.getElementById("returnBookSelect");
+      loanSelect.innerHTML = available.length ? "" : '<option value="">Nessun libro disponibile</option>';
+      available.forEach(book => { const o = document.createElement("option"); o.value = value(book,"ID"); o.textContent = `${value(book,"Titolo")} — ${value(book,"Autore")} — ${value(book,"Proprietario")}`; loanSelect.appendChild(o); });
+      returnSelect.innerHTML = loaned.length ? "" : '<option value="">Nessun libro in prestito</option>';
+      loaned.forEach(book => { const loan = activeLoanFor(book); const o = document.createElement("option"); o.value = value(book,"ID"); o.textContent = `${value(book,"Titolo")} — prestato a ${loan ? value(loan,"richiedente") : value(book,"Prestato a")}`; returnSelect.appendChild(o); });
+    }
+
+    function renderReaders() {
+      const grid = document.getElementById("readersGrid"); grid.innerHTML = "";
+      if (!state.readers.length) { grid.innerHTML = '<div class="empty-state">Ancora nessun lettore registrato.</div>'; return; }
+      state.readers.forEach(reader => { const nickname = value(reader,"Nome visualizzato") || value(reader,"Nickname") || "Lettore misterioso"; const avatar = value(reader,"Avatar","📚"); const title = value(reader,"Titolo avatar","Lettore senza titolo"); const completed = state.readings.filter(r => value(r,"Nickname").toLowerCase() === value(reader,"Nickname").toLowerCase() && value(r,"Stato lettura").toLowerCase() === "finito").length; const card = document.createElement("article"); card.className = "reader-card"; card.innerHTML = `<div class="avatar">${escapeHTML(avatar)}</div><h3>${escapeHTML(nickname)}</h3><p><strong>${escapeHTML(title)}</strong></p><p style="margin-top:8px;">Letture finite: ${completed}</p>`; grid.appendChild(card); });
+    }
+
+    function renderReadings() {
+      const list = document.getElementById("activityList"); list.innerHTML = "";
+      const readings = [...state.readings].reverse();
+      if (!readings.length) { list.innerHTML = '<div class="empty-state">Nessuna lettura registrata. Qualcuno apra un libro, anche solo per figura.</div>'; return; }
+      readings.slice(0,12).forEach(reading => { const status = value(reading,"Stato lettura","Aggiornamento"); const icon = status.toLowerCase().includes("finito") ? "✅" : status.toLowerCase().includes("mollato") ? "🫠" : status.toLowerCase().includes("leggendo") ? "📖" : "📝"; const vote = value(reading,"Voto") ? ` · Voto: ${escapeHTML(value(reading,"Voto"))}/5` : ""; const review = value(reading,"Recensione breve") ? `“${escapeHTML(value(reading,"Recensione breve"))}”` : "Nessuna recensione, mistero letterario."; const card = document.createElement("article"); card.className = "activity-card"; card.innerHTML = `<div class="activity-icon">${icon}</div><div><h3>${escapeHTML(value(reading,"Nickname","Qualcuno"))} — ${escapeHTML(status)} “${escapeHTML(value(reading,"Titolo libro"))}”</h3><p>${escapeHTML(value(reading,"Autore"))}${vote}<br>${review}</p></div><span class="chip">${escapeHTML(value(reading,"Consigliato") || "TN2G")}</span>`; list.appendChild(card); });
+    }
+
+    function applyFilters() {
+      const query = document.getElementById("searchInput").value.toLowerCase().trim();
+      const status = document.getElementById("statusFilter").value;
+      const category = document.getElementById("categoryFilter").value;
+      state.filteredBooks = state.books.filter(book => {
+        const haystack = [value(book,"ID"), value(book,"Titolo"), value(book,"Autore"), value(book,"Proprietario"), value(book,"Categoria"), value(book,"Note")].join(" ").toLowerCase();
+        const bookStatus = isLoaned(book) ? "in prestito" : value(book,"Stato").toLowerCase();
+        return (!query || haystack.includes(query)) && (status === "all" || bookStatus === status) && (category === "all" || value(book,"Categoria").toLowerCase() === category);
+      }).sort(compareBooks);
+      renderCatalog();
+    }
+
+    function openBookModal(book) {
+      const loan = activeLoanFor(book);
+      const loaned = isLoaned(book);
+      const status = loaned ? "In prestito" : (value(book,"Stato") || "Non indicato");
+      const modalContent = document.getElementById("modalContent");
+      modalContent.innerHTML = `<h2>${escapeHTML(value(book,"Titolo"))}</h2><p>${escapeHTML(value(book,"Autore"))}</p><div class="modal-grid"><div class="detail"><strong>ID libro</strong><span>${escapeHTML(value(book,"ID"))}</span></div><div class="detail"><strong>Stato</strong><span>${escapeHTML(status)}</span></div><div class="detail"><strong>Proprietario</strong><span>${escapeHTML(value(book,"Proprietario","Non indicato"))}</span></div><div class="detail"><strong>Categoria</strong><span>${escapeHTML(value(book,"Categoria","Senza categoria"))}</span></div><div class="detail"><strong>Prestato a</strong><span>${escapeHTML(loan ? value(loan,"richiedente") : value(book,"Prestato a","—"))}</span></div><div class="detail"><strong>Restituzione prevista</strong><span>${escapeHTML(loan ? dateFromLoan(loan,["data_restituzione_prevista","Data restituzione prevista"]) : value(book,"Data restituzione prevista","—"))}</span></div></div><div class="detail"><strong>Note</strong><span>${escapeHTML(value(book,"Note","Nessuna nota."))}</span></div><div class="section-actions" style="margin-top:18px;">${loaned ? `<button class="btn btn-red" onclick="returnBookFromModal('${escapeHTML(value(book,"ID"))}')">Segnala restituzione</button>` : `<button class="btn btn-green" onclick="scrollToLoan('${escapeHTML(value(book,"ID"))}')">Richiedi prestito</button>`}<a class="btn btn-blue" href="${CONFIG.forms.registraLettura}" target="_blank" rel="noopener noreferrer">Registra lettura</a></div><div id="modalFeedback" class="feedback"></div>`;
+      document.getElementById("modalBackdrop").classList.add("is-open");
+    }
+
+    function scrollToLoan(bookId) { closeModal(); document.getElementById("prestiti").scrollIntoView({behavior:"smooth"}); document.getElementById("loanBookSelect").value = bookId; document.getElementById("loanNickname").focus(); }
+    window.scrollToLoan = scrollToLoan;
+    window.returnBookFromModal = async function(bookId) { await performReturn(bookId, document.getElementById("modalFeedback")); };
+
+    async function sendBackend(payload) {
+      await fetch(CONFIG.backendUrl, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
+    }
+
+    async function performLoan(bookId, nickname, note, feedbackEl) {
+      if (!bookId) return setFeedback(feedbackEl, "Nessun libro selezionato.", true);
+      if (!nickname.trim()) return setFeedback(feedbackEl, "Inserisci il nickname del richiedente.", true);
+      setFeedback(feedbackEl, "Invio prestito al Nettuno...", false);
+      await sendBackend({ action: "loan", book_id: bookId, richiedente: nickname.trim(), note: note.trim() });
+      setFeedback(feedbackEl, "Richiesta inviata. Aggiorno la biblioteca tra pochi secondi...", false);
+      setTimeout(loadData, 2200);
+    }
+
+    async function performReturn(bookId, feedbackEl) {
+      if (!bookId) return setFeedback(feedbackEl, "Nessun libro selezionato.", true);
+      setFeedback(feedbackEl, "Segnalo restituzione al Nettuno...", false);
+      await sendBackend({ action: "return", book_id: bookId });
+      setFeedback(feedbackEl, "Restituzione inviata. Aggiorno la biblioteca tra pochi secondi...", false);
+      setTimeout(() => { closeModal(); loadData(); }, 2200);
+    }
+
+    function setFeedback(el, text, isError) { el.textContent = text; el.className = "feedback " + (isError ? "error" : "ok"); }
+    function closeModal() { document.getElementById("modalBackdrop").classList.remove("is-open"); }
+
+    document.getElementById("searchInput").addEventListener("input", applyFilters);
+    document.getElementById("statusFilter").addEventListener("change", applyFilters);
+    document.getElementById("categoryFilter").addEventListener("change", applyFilters);
+    document.getElementById("closeModal").addEventListener("click", closeModal);
+    document.getElementById("modalBackdrop").addEventListener("click", e => { if (e.target.id === "modalBackdrop") closeModal(); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+    document.getElementById("loanSubmitBtn").addEventListener("click", () => performLoan(document.getElementById("loanBookSelect").value, document.getElementById("loanNickname").value, document.getElementById("loanNote").value, document.getElementById("loanFeedback")));
+    document.getElementById("returnSubmitBtn").addEventListener("click", () => performReturn(document.getElementById("returnBookSelect").value, document.getElementById("returnFeedback")));
+
+    loadData();
+  </script>
+</body>
+</html>
