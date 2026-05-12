@@ -1029,12 +1029,12 @@
           fetchCSV(CONFIG.csv.prestiti)
         ]);
 
-        state.books = books && books.length ? books : DEMO.libri;
-        state.readers = readers && readers.length ? readers : DEMO.lettori;
-        state.readings = readings && readings.length ? readings : DEMO.letture;
-        state.loans = loans && loans.length ? loans : DEMO.prestiti;
+        state.books = books || [];
+        state.readers = readers || [];
+        state.readings = readings || [];
+        state.loans = loans || [];
 
-        usedDemo = !books || !readers || !readings;
+        usedDemo = false;
       } catch (error) {
         console.warn(error);
         state.books = DEMO.libri;
